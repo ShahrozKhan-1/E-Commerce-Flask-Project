@@ -170,7 +170,7 @@
         </a>
     </div>
 
-    <div class="row g-4">
+    <div class="row mb-4 g-4">
         {% for product in group.products %}
         <div class="col-lg-3 col-md-4 col-sm-6">
             <a href="{{ url_for('product.display_product', product_id=product.id) }}" class="card-link">
