@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">{{ category.name }}</h2>
+
+    {% if products %}
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4 col-sm-6">
+            <div class="card border-0 shadow-lg rounded-4 h-100 product-card">
+                <img src="{{  product.first_image }}" 
+                     class="card-img-top rounded-top-4" style="height: 230px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ product.name }}</h5>
+                    <p class="fw-bold fs-5">Rs. {{ product.price }}</p>
+                    <p class="text-muted mb-1"><small>Brand:</small> {{ product.brand }}</p>
+                    <p class="card-text text-truncate" title="{{ product.description }}">
+                        {{ product.description }}
+                    </p>
+                    <a href="{{ url_for('product.display_product', product_id=product.id) }}" 
+                       class="btn btn-dark w-100 rounded-pill">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>No products found in this category.</p>
+    {% endif %}
+</div>
+
+<style>
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}

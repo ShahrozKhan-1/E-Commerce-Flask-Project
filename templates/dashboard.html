@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .product-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .card-img-container {
+        height: 220px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .product-card img {
+        width: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .product-card:hover img {
+        transform: scale(1.05);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+
+    .card-text {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .price {
+        font-weight: 700;
+        color: black;
+        font-size: 1.2rem;
+        margin-top: auto;
+    }
+
+    .action-menu {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+    }
+
+    .menu-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .menu-btn:hover {
+        background: white;
+        transform: scale(1.1);
+    }
+
+    .dropdown-menu {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .dropdown-item {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .dropdown-item:active {
+        background-color: #f8f9fa;
+        color: #000;
+    }
+
+    .category-header {
+        position: relative;
+        padding-bottom: 10px;
+        margin-bottom: 25px;
+    }
+
+    .category-header h3 {
+        display: inline-block;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .category-header h3:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: #3498db;
+    }
+
+    .see-all-btn {
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.25rem 1rem;
+    }
+
+    a.card-link {
+        text-decoration: none;
+        color: inherit;
+    }
+</style>
+
+<div class="container mt-3">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-info alert-dismissible fade show shadow-sm" role="alert">
+                {% for message in messages %}
+                    <div>{{ message }}</div>
+                {% endfor %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+
+<div class="container py-4 position-relative">
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('product.add_product') }}" class="btn btn-dark">
+            Add Product
+        </a>
+    </div>
+    {% for group in category_products %}
+    <div class="d-flex justify-content-between align-items-center mb-4 category-header">
+        <h3>{{ group.category.name }}</h3>
+        <a href="{{ url_for('product.category_products', category_id=group.category.id) }}" 
+            class="btn btn-outline-dark see-all-btn rounded-pill">
+            See all
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for product in group.products %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <a href="{{ url_for('product.display_product', product_id=product.id) }}" class="card-link">
+                <div class="product-card shadow-sm position-relative bg-white">
+                    <!-- Product Image -->
+                    <div class="card-img-container">
+                        <img src="{{ product.first_image }}" class="img-fluid" alt="{{ product.name }}">
+                        
+                        <!-- Action Menu - Visible only to admins or the owner -->
+                        
+                        <div class="dropdown position-absolute top-0 end-0 m-2">
+                                {% if product.user_id == current_user.id or current_user.is_admin %}
+                                <button class="btn btn-light btn-sm rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical text-dark" viewBox="0 0 16 16">
+                                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                    </svg>
+                                </button>
+                                {% endif %}
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    {% if current_user.is_authenticated and (product.user_id == current_user.id or current_user.is_admin) %}
+                                        <li>
+                                            <form action="{{ url_for('product.edit_product', product_id=product.id) }}" method="post" class="d-inline">
+                                                <button type="submit" class="dropdown-item">Edit</button>
+                                            </form>
+                                        </li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    {% if current_user.is_authenticated and (product.user_id == current_user.id or current_user.is_admin) %}
+                                        <li>
+                                            <form action="{{ url_for('product.delete_product', product_id=product.id) }}" method="post" class="d-inline">
+                                                <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                            </form>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <p class="card-text">Brand: {{ product.brand }}</p>
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-truncate" title="{{ product.description }}">
+                            {{ product.description }}
+                        </p>
+                        <p class="price mt-2">Rs. {{ product.price }}</p>
+                        <a href="{{ url_for('product.add_to_cart', product_id=product.id) }}" 
+                            class="btn btn-outline-secondary btn-sm">Add to Cart</a>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+        <div class="text-center py-5">
+            <div class="display-4 text-muted mb-4">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <h4 class="text-muted">No products available</h4>
+            <p class="text-muted">Add some products to see them here</p>
+            <a href="{{ url_for('product.add_product') }}" class="btn btn-dark mt-3">
+                <i class="bi bi-plus-circle"></i> Add Product
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

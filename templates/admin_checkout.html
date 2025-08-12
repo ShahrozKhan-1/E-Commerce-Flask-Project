@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %} Admin Checkout {% endblock %}
+
+{% block content %}
+<style>
+    .checkout-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 25px;
+    }
+    .checkout-header {
+        background-color: #f8f9fa;
+        padding: 15px 20px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .checkout-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .checkout-item:last-child {
+        border-bottom: none;
+    }
+    .total-section {
+        background-color: #f8f9fa;
+        padding: 12px 20px;
+        font-weight: bold;
+        font-size: 1rem;
+        text-align: right;
+    }
+    .customer-info {
+        padding: 15px 20px;
+        background-color: #f0f8ff;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .customer-detail {
+        margin-bottom: 8px;
+    }
+    .customer-detail strong {
+        display: inline-block;
+        width: 120px;
+    }
+    .order-time {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-align: right;
+        padding: 0 20px 10px;
+    }
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-left: 10px;
+    }
+    .btn-status {
+        font-size: 0.85rem;
+        padding: 3px 10px;
+        margin-left: 10px;
+    }
+</style>
+
+<div class="container my-5">
+    <h3 class="mb-4 text-center fw-bold">Order Management</h3>
+
+    {% for checkout in checkout_item %}
+        <div class="card checkout-card">
+            <div class="checkout-header d-flex justify-content-between align-items-center">
+                <div>
+                    Order #{{ checkout.id }}
+                </div>
+                <div class="order-time">
+                    {{ checkout.checkout_time.strftime('%b %d, %Y %I:%M %p') }}
+                </div>
+            </div>
+
+            <div class="customer-info">
+                <div class="customer-detail">
+                    <strong>Customer:</strong> 
+                    {{ checkout.customer_name }} 
+                </div>
+                <div class="customer-detail">
+                    <strong>Delivery Address:</strong> 
+                    {{ checkout.address }}
+                </div>
+                <div class="customer-detail">
+                    <strong>Contact:</strong> 
+                    {{ checkout.buyer.email }}
+                </div>
+            </div>
+
+            {% for item in checkout.details %}
+                <div class="checkout-item">
+                    <div>
+                        <div class="fw-semibold">{{ item.product_name }}</div>
+                        <small class="text-muted">Quantity: {{ item.quantity }}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="fw-bold">Rs. {{ item.price }}</span>
+                        <br>
+                        <small>Subtotal: Rs. {{ item.price * item.quantity }}</small>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <div class="total-section">
+                Total: Rs. {{ checkout.total_price }}
+            </div>
+            
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            No orders found.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Add Product
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .image-preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .image-preview {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border: 1px solid #dee2e6;
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 14px;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+
+    .upload-area {
+        border: 2px dashed #ced4da;
+        border-radius: 10px;
+        padding: 25px;
+        text-align: center;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        cursor: pointer;
+    }
+
+    .upload-area:hover,
+    .upload-area.dragover {
+        background-color: #e9ecef;
+        border-color: #6c757d;
+    }
+
+    .upload-icon {
+        font-size: 48px;
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+
+    .upload-text {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+
+    .upload-subtext {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .btn-dark:hover {
+        background-color: #23272b;
+        border-color: #1d2124;
+    }
+
+    /* Style for Add New Category option */
+    .add-category-option {
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container mt-5 flex-fill">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 rounded-lg overflow-hidden">
+                <div class="card-header bg-dark text-white text-center py-3">
+                    <h4 class="mb-0 fw-semibold">Add New Product</h4>
+                </div>
+                <div class="card-body px-4 py-4">
+                    <form action="{{ url_for('product.add_product') }}" method="post" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-4">
+                            {{ form.name.label(class="form-label fw-semibold text-secondary") }}
+                            {{ form.name(class="form-control form-control-lg py-2", placeholder="Enter product name") }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.price.label(class="form-label fw-semibold text-secondary") }}
+                            {{ form.price(class="form-control form-control-lg py-2") }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.brand.label(class="form-label fw-semibold text-secondary") }}
+                            {{ form.brand(class="form-control form-control-lg py-2") }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.description.label(class="form-label fw-semibold text-secondary") }}
+                            {{ form.description(class="form-control form-control-lg py-2", rows="4") }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.category.label(class="form-label fw-semibold text-secondary") }}
+                            {{ form.category(class="form-select", id="categorySelect") }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.images.label(class="form-label fw-semibold text-secondary") }}
+                            <input type="file" name="images" id="images" class="form-control form-control-lg py-2"
+                                multiple accept="image/*" style="display: none;">
+
+                            <div class="upload-area" id="upload-area">
+                                <div class="upload-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                                        class="bi bi-cloud-arrow-up" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                            d="M7.646 5.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2z" />
+                                        <path
+                                            d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z" />
+                                    </svg>
+                                </div>
+                                <div class="upload-text">Click to upload or drag & drop</div>
+                                <div class="upload-subtext">PNG, JPG, JPEG (max 5 images)</div>
+                            </div>
+
+                            <div class="image-preview-container" id="image-preview-container"></div>
+
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-muted">You can select multiple images (max 5)</small>
+                                <small class="text-muted" id="file-count">0 images selected</small>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            {{ form.add_product(class="btn btn-dark btn-lg px-5 py-2 fw-semibold", id="mybutton") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="categoryName" class="form-control" placeholder="Enter category name">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="saveCategoryBtn" class="btn btn-primary">Save Category</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const categorySelect = document.getElementById("categorySelect");
+        const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+        const saveBtn = document.getElementById("saveCategoryBtn");
+
+        categorySelect.addEventListener("click", function () {
+            if (this.value === "-1") {
+                modal.show();
+                this.value = "";
+            }
+        });
+
+        saveBtn.addEventListener("click", function () {
+            const categoryName = document.getElementById("categoryName").value.trim();
+            if (!categoryName) {
+                alert("Please enter category name");
+                return;
+            }
+
+            fetch("{{ url_for('product.add_category') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ category_name: categoryName })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        alert("Error: " + data.error);
+                    } else {
+                        const option = new Option(data.name, data.id);
+                        option.selected = true;
+
+                        categorySelect.insertBefore(option, categorySelect.options[categorySelect.options.length - 1]);
+
+                        document.getElementById("categoryName").value = "";
+                        modal.hide();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        });
+
+        const imageInput = document.getElementById('images');
+        const uploadArea = document.getElementById('upload-area');
+        const previewContainer = document.getElementById('image-preview-container');
+        const fileCountElement = document.getElementById('file-count');
+        const submitButton = document.getElementById('mybutton');
+        const form = submitButton.closest("form");
+        let files = [];
+
+        uploadArea.addEventListener('click', () => imageInput.click());
+        imageInput.addEventListener('change', e => handleFiles(e.target.files));
+
+        ['dragover', 'dragenter'].forEach(event => {
+            uploadArea.addEventListener(event, e => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'dragend', 'drop'].forEach(event => {
+            uploadArea.addEventListener(event, e => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+        });
+
+        uploadArea.addEventListener('drop', e => {
+            if (e.dataTransfer.files.length) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        function handleFiles(newFiles) {
+            const newFilesArray = Array.from(newFiles);
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+            // Filter valid images
+            const validFiles = newFilesArray.filter(file =>
+                allowedTypes.includes(file.type)
+            );
+
+            // Check for invalid files
+            if (validFiles.length !== newFilesArray.length) {
+                alert('Only JPG, PNG, and JPEG images are allowed');
+            }
+
+            if (files.length + validFiles.length > 5) {
+                alert('You can only upload up to 5 images');
+                return;
+            }
+
+            files = [...files, ...validFiles];
+            updatePreview();
+            updateFileCount();
+            imageInput.value = '';
+        }
+
+        function updatePreview() {
+            previewContainer.innerHTML = '';
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview';
+                    preview.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview">
+                    <div class="remove-image" data-index="${index}">×</div>
+                `;
+                    previewContainer.appendChild(preview);
+
+                    // Add remove event
+                    preview.querySelector('.remove-image').addEventListener('click', function () {
+                        files.splice(parseInt(this.dataset.index), 1);
+                        updatePreview();
+                        updateFileCount();
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateFileCount() {
+            fileCountElement.textContent = `${files.length} image${files.length !== 1 ? 's' : ''} selected`;
+        }
+
+        form.addEventListener("submit", function (e) {
+            if (files.length === 0) {
+                alert('Please select at least one image');
+                e.preventDefault();
+                return;
+            }
+
+            // Update files in input element
+            const dataTransfer = new DataTransfer();
+            files.forEach(file => dataTransfer.items.add(file));
+            imageInput.files = dataTransfer.files;
+
+            // Disable button during processing
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Processing...
+        `;
+        });
+    });
+</script>
+
+{% endblock %}

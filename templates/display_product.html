@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ product.name }} - Product Details
+{% endblock %}
+
+{% block content %}
+<style>
+    .product-details-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 15px;
+    }
+
+    .product-gallery {
+        position: relative;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        padding: 20px;
+    }
+
+    .main-image-container {
+        position: relative;
+        height: 500px;
+        overflow: hidden;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .main-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .thumbnail-container {
+        display: flex;
+        gap: 10px;
+        padding: 10px 0;
+        overflow-x: auto;
+    }
+
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .thumbnail:hover, .thumbnail.active {
+        border-color: #2d6a4f;
+        transform: scale(1.05);
+    }
+
+    .product-info-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 30px;
+        height: 100%;
+    }
+
+    .product-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+
+    }
+
+    .product-meta {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .meta-label {
+        font-size: 0.85rem;
+        color: #777;
+    }
+
+    .meta-value {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .product-price {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+    }
+
+    .product-description {
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 30px;
+        font-size: 1.05rem;
+    }
+
+    .add-to-cart-form {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .quantity-btn {
+        background: #f8f9fa;
+        border: none;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .quantity-btn:hover {
+        background: #e9ecef;
+    }
+
+    .quantity-input {
+        width: 60px;
+        height: 40px;
+        border: none;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    /* .btn-add-to-cart {
+        background: BLC;
+        color: white;
+        border: none;
+        padding: 0 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-add-to-cart:hover {
+        background: #245c43;
+    } */
+
+    .seller-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+    }
+
+    .seller-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 1.2rem;
+    }
+
+    .seller-details {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .seller-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: black;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .seller-name {
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .seller-contact {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .main-image-container {
+            height: 400px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .main-image-container {
+            height: 300px;
+        }
+        
+        .product-title {
+            font-size: 1.8rem;
+        }
+        
+        .product-price {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="product-details-container">
+    <div class="row g-4">
+        <!-- Product Images Gallery -->
+        <div class="col-lg-7">
+            <div class="product-gallery">
+                <div class="main-image-container">
+                    {% if product.images %}
+                        <img id="main-image" src="{{ product.images[0].url }}" alt="{{ product.name }}" class="main-image">
+                    {% else %}
+                        <div class="d-flex justify-content-center align-items-center h-100 bg-light">
+                            <p class="text-muted">No images available</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if product.images|length > 1 %}
+                <div class="thumbnail-container">
+                    {% for image in product.images %}
+                    <img src="{{ image.url }}" 
+                         alt="Thumbnail {{ loop.index }}" 
+                         class="thumbnail {% if loop.first %}active{% endif %}" 
+                         data-main="{{ image.url }}">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Product Information -->
+        <div class="col-lg-5">
+            <div class="product-info-card">
+                <h1 class="product-title">{{ product.name }}</h1>
+                
+                <div class="product-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Brand</span>
+                        <span class="meta-value">{{ product.brand }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Category</span>
+                        <span class="meta-value">{{ product.category.name }}</span>
+                    </div>
+                </div>
+                
+                <div class="product-price">Rs. {{ product.price }}</div>
+                
+                <p class="product-description">{{ product.description }}</p>
+                
+                <form method="POST" action="{{ url_for('product.add_to_cart', product_id=product.id) }}" class="add-to-cart-form">
+                    <div class="quantity-control">
+                        <button type="button" class="quantity-btn minus-btn">-</button>
+                        <input type="number" name="quantity" value="1" min="1" class="quantity-input">
+                        <button type="button" class="quantity-btn plus-btn">+</button>
+                    </div>
+                    <button type="submit" name="add_to_cart" class="btn btn-dark">
+                        Add to Cart
+                    </button>
+                </form>
+                
+                <div class="seller-info">
+                    <div class="seller-title">Seller Information</div>
+                    <div class="seller-details">
+                        <div class="seller-avatar">
+                            {{ product.user.username[0]|upper }}
+                        </div>
+                        <div>
+                            <div class="seller-name">{{ product.user.username }}</div>
+                            <div class="seller-contact">{{ product.user.email }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Image gallery functionality
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const mainImage = document.getElementById('main-image');
+    
+    if (thumbnails.length && mainImage) {
+        thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                // Update main image
+                const newSrc = this.getAttribute('data-main');
+                mainImage.src = newSrc;
+                
+                // Update active thumbnail
+                thumbnails.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    }
+    
+    // Quantity controls
+    const minusBtn = document.querySelector('.minus-btn');
+    const plusBtn = document.querySelector('.plus-btn');
+    const quantityInput = document.querySelector('.quantity-input');
+    
+    if (minusBtn && plusBtn && quantityInput) {
+        minusBtn.addEventListener('click', function() {
+            let value = parseInt(quantityInput.value);
+            if (value > 1) {
+                quantityInput.value = value - 1;
+            }
+        });
+        
+        plusBtn.addEventListener('click', function() {
+            let value = parseInt(quantityInput.value);
+            quantityInput.value = value + 1;
+        });
+    }
+});
+</script>
+{% endblock %}
