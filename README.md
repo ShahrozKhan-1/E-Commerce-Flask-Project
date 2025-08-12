@@ -48,7 +48,13 @@ An online shopping platform built with Python's Flask framework, featuring user 
      source venv/bin/activate
      ```
 
-4. Set up the database:
+4. Install dependencies:
+
+   ```bash
+   >>> pip install -r requirements.txt
+   ```
+
+5. Set up the database:
 
    ```bash
    python
@@ -57,7 +63,7 @@ An online shopping platform built with Python's Flask framework, featuring user 
    >>> exit()
    ```
 
-5. Run the application:
+6. Run the application:
 
    ```bash
    python app.py
