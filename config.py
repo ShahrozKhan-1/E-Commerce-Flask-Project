@@ -1,16 +1,16 @@
+import os
+from dotenv import load_dotenv
 import cloudinary
 
-
+load_dotenv()
 
 class config:
-    SECRET_KEY = 'secretkey'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///db.sqlite'
+    SECRET_KEY = os.getenv("SECRET_KEY") 
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    
-    
+
 cloudinary.config( 
-    cloud_name = "dsxlk12bs", 
-    api_key = "534613577116544", 
-    api_secret = "poDHs5c_IrodeHgifY1grJ3HwUw"
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+    api_key = os.getenv("CLOUDINARY_API_KEY"), 
+    api_secret = os.getenv("CLOUDINARY_API_SECRET")
 )
