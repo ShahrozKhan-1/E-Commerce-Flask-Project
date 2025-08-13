@@ -1,6 +1,5 @@
 from app import db
 from flask_login import UserMixin
-from sqlalchemy.dialects.sqlite import JSON
 from datetime import datetime
 
 
@@ -15,11 +14,11 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"<User {self.username} ({self.email})>"
 
+
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)  
-    products = db.relationship("Product", back_populates="category", lazy=True)
-
+    
 
 class ProductImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,6 +26,7 @@ class ProductImage(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='CASCADE'), nullable=False)
 
     product = db.relationship('Product', backref=db.backref('images', lazy=True, cascade='all, delete-orphan'))
+
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,9 +40,8 @@ class Product(db.Model):
         db.ForeignKey('category.id', name='fk_category_id', ondelete='CASCADE'),
         nullable=False
     )
-
     user = db.relationship('User', backref='products')
-    category = db.relationship('Category', back_populates='products')
+    category = db.relationship('Category', backref='products', lazy=True)
 
     def __repr__(self):
         return f"<Product {self.name}>"
@@ -52,7 +51,6 @@ class Product(db.Model):
         if self.images:
             return self.images[0].url
         return None 
-
 
 
 class Cart(db.Model):

@@ -37,6 +37,7 @@ def delete_product(product_id):
     else:
         flash("You are not authorized to delete this product.")
         return redirect(url_for("product.dashboard"))
+    return redirect(url_for("product.dashboard"))
 
 
 @product.route("/add-product", methods=["POST", "GET"])
