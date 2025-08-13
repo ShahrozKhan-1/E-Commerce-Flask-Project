@@ -107,7 +107,7 @@ Edit Product
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Image upload handling
+
     const imageInput = document.getElementById('images');
     const uploadArea = document.getElementById('uploadArea');
     const imagePreviews = document.getElementById('imagePreviews');
@@ -188,7 +188,7 @@ function deleteImage(button) {
         const imageId = button.dataset.imageId;
         const productId = '{{ product.id }}';
         
-        fetch(`/products/${productId}/delete-image/${imageId}`, {
+        fetch(`/products/delete-image/${imageId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

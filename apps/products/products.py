@@ -16,7 +16,7 @@ def dashboard():
     categories = Category.query.all()
     category_products = []
     for category in categories:
-        products = Product.query.filter_by(category_id=category.id).limit(4).all()   
+        products = Product.query.filter_by(category_id=category.id).limit(4) 
         if products:
             category_products.append({
                 "category": category,
@@ -37,7 +37,6 @@ def delete_product(product_id):
     else:
         flash("You are not authorized to delete this product.")
         return redirect(url_for("product.dashboard"))
-    return redirect(url_for("product.dashboard"))
 
 
 @product.route("/add-product", methods=["POST", "GET"])
@@ -49,7 +48,7 @@ def add_product():
     form.category.choices = categories
     if form.validate_on_submit():
         if form.category.data == -1:
-            flash("Please add a category first before saving the product.", "warning")
+            flash("Please add a category first before saving the product.")
             return render_template("add_product.html", form=form)
         new_product = Product(
             name=form.name.data,
@@ -72,7 +71,7 @@ def add_product():
                     )
                     db.session.add(new_image)
                 except Exception as e:
-                    flash(f"Error uploading image: {str(e)}", "error")
+                    flash(f"Error uploading image: {str(e)}")
                     continue
         if not new_product.images:
             flash("At least one image is required")
@@ -138,9 +137,9 @@ def display_product(product_id):
     return render_template("display_product.html", product=product)
 
 
-@product.route("/products/<int:product_id>/delete-image/<int:image_id>", methods=["POST"])
+@product.route("/products/delete-image/<int:image_id>", methods=["POST"])
 @login_required
-def delete_image(product_id, image_id):
+def delete_image(image_id):
     image = ProductImage.query.get_or_404(image_id)    
     if image.product.user_id != current_user.id and not current_user.is_admin:
         return "Unauthorized"    
@@ -158,7 +157,7 @@ def add_category():
     data = request.get_json()
     name = data.get("category_name")
     if not name:
-        return jsonify({"error": "Category name is required"}), 400
+        return jsonify({"error": "Category name is required"})
     new_category = Category(name=name)
     db.session.add(new_category)
     db.session.commit()

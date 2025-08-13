@@ -61,11 +61,9 @@ def update_account():
     new_password = request.form.get("new_password")
     confirm_password = request.form.get("confirm_password")
 
-    # Update username & email
     current_user.username = username
     current_user.email = email
 
-    # Handle password change
     if current_password and new_password and confirm_password:
         if not check_password_hash(current_user.password, current_password):
             flash("Current password is incorrect.", "danger")
