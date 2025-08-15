@@ -70,13 +70,13 @@
                     <div class="col-md-5">
                         <img class="img-fluid w-100 product-img" src="{{ product.first_image }}" alt="{{ product.name }}">
                     </div>
-                    <div class="col-md-7 product-info bg-light">
-                        <h3>{{ product.name }}</h3>
+                    <div class="col-md-7 product-info bg-light ">
+                        <h3 class="text-capitalize">{{ product.name }}</h3>
                         <p class="product-price">Rs. {{ product.price }}</p>
                         <hr>
                         
                         
-                        <p class="product-title mt-3">About this product</p>
+                        <p class="product-title mt-3 text-capitalize">About this product</p>
                         <p class="product-description">{{ product.description }}</p>
                         {% if current_user.is_admin or current_user.id == product.user_id%}
                             <form method="POST" action="{{ url_for('product.delete_product', product_id=product.id) }}">

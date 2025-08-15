@@ -23,6 +23,7 @@ class Category(db.Model):
 class ProductImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(255), nullable=False)
+    public_id = db.Column(db.String(255), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='CASCADE'), nullable=False)
 
     product = db.relationship('Product', backref=db.backref('images', lazy=True, cascade='all, delete-orphan'))
@@ -35,11 +36,8 @@ class Product(db.Model):
     description = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     brand = db.Column(db.String(255), nullable=False)
-    category_id = db.Column(
-        db.Integer, 
-        db.ForeignKey('category.id', name='fk_category_id', ondelete='CASCADE'),
-        nullable=False
-    )
+    category_id = db.Column( db.Integer, db.ForeignKey('category.id', name='fk_category_id', ondelete='CASCADE'), nullable=False)
+    
     user = db.relationship('User', backref='products')
     category = db.relationship('Category', backref='products', lazy=True)
 
@@ -59,17 +57,16 @@ class Cart(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id', name='fk_cart_product_id', ondelete="CASCADE"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
     
+    checkouts = db.relationship('Checkout', backref='cart', lazy=True)    
     product = db.relationship('Product', backref='cart_items', lazy='joined')
     user = db.relationship('User', backref='cart_items')
 
     
 class Checkout(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name="fk_user_id", ondelete='CASCADE'), nullable=False)
-    details = db.Column(db.JSON, nullable=False)
     checkout_time = db.Column(db.DateTime, default=datetime.now())
-    total_price = db.Column(db.Integer, nullable=False)
-    customer_name = db.Column(db.String(255), nullable=False)
     address = db.Column(db.String(255), nullable=False)
-
-    buyer = db.relationship('User', backref='checkouts')
+    contact_no = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    total_price = db.Column(db.Integer, nullable=False)
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.id', name='fk_cart_id', ondelete='CASCADE'), nullable=False)

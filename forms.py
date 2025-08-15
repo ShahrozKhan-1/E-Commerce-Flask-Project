@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, EmailField, IntegerField, TextAreaField, FileField, SelectField, MultipleFileField
-from wtforms.validators import DataRequired, Length, ValidationError, Email
+from wtforms.validators import DataRequired, Length, ValidationError, Email, Optional
 from flask_wtf.file import FileRequired, FileAllowed
 
 
@@ -48,3 +48,15 @@ class EditProduct(FlaskForm):
     ])
     edit_product = SubmitField("Update")
 
+class OrderDetail(FlaskForm):
+    contact = StringField("Contact Number", validators=[DataRequired()])
+    address = StringField("Delivery Address", validators=[DataRequired()])
+    message = TextAreaField("Special Instructions (Optional)")
+    submit = SubmitField("Place Order")
+    
+class UpdateAccount(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    current_password = PasswordField('Current Password', validators=[Optional()])
+    new_password = PasswordField('New Password', validators=[Optional()])
+    confirm_password = PasswordField('Confirm Password', validators=[Optional()])

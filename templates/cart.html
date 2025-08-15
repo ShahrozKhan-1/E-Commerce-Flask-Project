@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-md-8">
                         <div class="card-body d-flex flex-column justify-content-between h-100">
-                            <h5 class="card-title">{{ item.product.name }}</h5>
+                            <h5 class="card-title text-capitalize">{{ item.product.name }}</h5>
                             <p class="card-text">{{ item.product.description }}</p>
 
                             <div class="d-flex justify-content-between align-items-center">
@@ -54,7 +54,7 @@
                     <div>Total</div>
                     <div><strong id="total">Rs. {{ price }}</strong></div>
                 </div>
-                <button data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-dark w-100">Confirm Order</button>
+                <a href="{{ url_for('product.checkout') }}" class="btn btn-dark w-100">Confirm Order</a>
                 
             </div>
         </div>
@@ -66,34 +66,6 @@
     <a href=" {{url_for('product.dashboard')}} " class="btn btn-outline-dark mt-3">Continue Shopping</a>
 </div>
 {% endif %}
-
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-        <form action="{{ url_for('product.checkout') }}" method="POST">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              
-              <div>
-                  <label for="name"> Customer Name </label>
-                  <input type="text" name="name">
-              </div>
-              <div>
-                  <label for="address"> Address </label>
-                  <input type="text" name="address">
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Checkout</button>
-            </div>
-        </form>
-    </div>
-  </div>
-</div>
 
 <script>
 function updateQuantity(itemId, quantity) {

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, url_for, redirect, flash
 from flask_login import login_required, current_user
-from forms import AddProduct, EditProduct
+from forms import AddProduct, EditProduct, OrderDetail
 from models import Category, Cart, Checkout, Product, User, ProductImage
 from app import db
 from flask import jsonify
@@ -28,7 +28,10 @@ def dashboard():
 @product.route("/delete-product/<int:product_id>", methods=["POST"])
 @login_required
 def delete_product(product_id):
-    product = Product.query.get_or_404(product_id)
+    product = Product.query.get(product_id)
+    images = ProductImage.query.filter_by(product_id=product_id)
+    for image in images:
+        delete_image(image.id)
     if product.user_id == current_user.id or current_user.is_admin:
         Cart.query.filter_by(product_id=product.id).delete()
         db.session.delete(product)
@@ -66,8 +69,10 @@ def add_product():
                 try:
                     upload_result = cloudinary.uploader.upload(image_file)
                     image_url = upload_result['secure_url']
+                    public_id=upload_result['public_id']
                     new_image = ProductImage(
                         url=image_url,
+                        public_id=public_id,
                         product_id=new_product.id
                     )
                     db.session.add(new_image)
@@ -86,7 +91,7 @@ def add_product():
 @product.route("/edit-product/<int:product_id>", methods=["GET", "POST"])
 @login_required
 def edit_product(product_id):
-    product = Product.query.get_or_404(product_id)
+    product = Product.query.get(product_id)
     if product.user_id != current_user.id and not current_user.is_admin:
         flash("Unauthorized")
         return redirect(url_for("product.dashboard"))
@@ -113,8 +118,10 @@ def edit_product(product_id):
                             upload_result = cloudinary.uploader.upload(image_file)
                             new_image = ProductImage(
                                 url=upload_result['secure_url'],
+                                public_id=upload_result['public_id'],
                                 product_id=product.id
                             )
+                            print( "Image URL is: " ,new_image)
                             db.session.add(new_image)
                         except Exception as e:
                             flash(f"Error uploading image: {str(e)}")          
@@ -141,10 +148,11 @@ def display_product(product_id):
 @product.route("/products/delete-image/<int:image_id>", methods=["POST"])
 @login_required
 def delete_image(image_id):
-    image = ProductImage.query.get_or_404(image_id)    
+    image = ProductImage.query.get(image_id)    
     if image.product.user_id != current_user.id and not current_user.is_admin:
         return "Unauthorized"    
     try:
+        cloudinary.uploader.destroy(image.public_id)
         db.session.delete(image)
         db.session.commit()
         return "Image deleted successfully"
@@ -167,7 +175,7 @@ def add_category():
 
 @product.route("/category/<int:category_id>")
 def category_products(category_id):
-    category = Category.query.get_or_404(category_id)
+    category = Category.query.get(category_id)
     products = Product.query.filter_by(category_id=category_id).all()
     return render_template("category_products.html", category=category, products=products)
 
@@ -197,11 +205,10 @@ def cart_items(user_id):
             new_quantity = request.form.get("quantity", type=int)
 
             if item_id and new_quantity and new_quantity > 0:
-                item = Cart.query.get_or_404(item_id)
-                if item.user_id == current_user.id or current_user.is_admin:
-                    item.quantity = new_quantity
-                    db.session.commit()
-                    return ""  
+                item = Cart.query.get(item_id)
+                item.quantity = new_quantity
+                db.session.commit()
+                return ""  
         total_sum = 0
         items = Cart.query.filter_by(user_id=user_id).all()
         for item in items:
@@ -223,28 +230,63 @@ def remove_cart_item(item_id ):
     items = Cart.query.filter_by(user_id=current_user.id)
     return render_template("cart.html", items=items)
 
-
 @product.route("/checkout", methods=["GET", "POST"])
 @login_required
 def checkout():
+    # Get all cart items for the current user
     cart_items = Cart.query.filter_by(user_id=current_user.id).all()
-    checkout_data = []
-    price = 0
-    customer_name = request.form.get("name")
-    address = request.form.get("address")
-    for item in cart_items:
-        checkout_data.append({
-            "product_name": item.product.name,
-            "price": item.product.price,
-            "quantity": item.quantity,
-        })
-        price += item.product.price * item.quantity
-    checkout = Checkout(details=checkout_data, total_price=price, user_id=current_user.id, customer_name=customer_name, address=address)
-    db.session.add(checkout)
-    for item in cart_items:
-        db.session.delete(item)
-    db.session.commit()
-    return redirect(url_for("product.order_confirmation",order_id=checkout.id))
+    
+    if not cart_items:
+        flash('Your cart is empty!', 'warning')
+        return redirect(url_for('product.dashboard'))
+
+    # Calculate total price
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
+    form = OrderDetail()
+
+    if form.validate_on_submit():
+        try:
+            # Prepare checkout details for each cart item
+            checkout_details = [
+                {
+                    "product_id": item.product.id,
+                    "product_name": item.product.name,
+                    "price": item.product.price,
+                    "quantity": item.quantity,
+                    "subtotal": item.product.price * item.quantity,
+                    "brand": item.product.brand,
+                    "category": item.product.category.name
+                }
+                for item in cart_items
+            ]
+
+            # Create a new Checkout for each Cart item
+            for cart_item in cart_items:
+                checkout = Checkout(
+                    total_price=total_price,
+                    contact_no=form.contact.data,
+                    message=form.message.data or "",
+                    address=form.address.data,
+                    cart_id=cart_item.id  # Link to the specific cart item
+                )
+                db.session.add(checkout)
+            Cart.query.filter_by(user_id=current_user.id).delete()
+            db.session.commit()
+            
+            flash('Your order has been placed successfully!', 'success')
+            return redirect(url_for('product.order_confirmation', order_id=checkout.id))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'error')
+
+    return render_template(
+        "get_order_detail.html", 
+        form=form, 
+        cart_items=cart_items, 
+        total_price=total_price, 
+        username=current_user.username
+    )
 
 
 @product.route("/user-products/<int:user_id>", methods=["GET"])
@@ -296,7 +338,7 @@ def shop():
 @product.route("/order-confirmation/<int:order_id>")
 @login_required
 def order_confirmation(order_id):
-    checkout = Checkout.query.get_or_404(order_id)
+    checkout = Checkout.query.get(order_id)
     return render_template("order_confirmation.html", checkout=checkout)
 
 

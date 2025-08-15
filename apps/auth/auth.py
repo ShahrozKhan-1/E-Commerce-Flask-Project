@@ -3,7 +3,7 @@ from models import User
 from app import db
 from flask_login import login_required, current_user, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegistrationForm
+from forms import LoginForm, RegistrationForm, UpdateAccount
 
 
 
@@ -19,10 +19,10 @@ def login():
         
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash('Logged in successfully!', 'success')
+            flash('Logged in successfully!')
             return redirect(url_for('product.dashboard'))
         else:
-            flash('Invalid email or password', 'danger')
+            flash('Invalid email or password')
 
     return render_template("login.html", form=form)
 
@@ -52,27 +52,27 @@ def logout():
     return redirect(url_for("auth.login"))
 
 
-@auth.route("/update-account", methods=["POST"])
+@auth.route("/user-account", methods=["GET", "POST"])
 @login_required
 def update_account():
-    username = request.form.get("username")
-    email = request.form.get("email")
-    current_password = request.form.get("current_password")
-    new_password = request.form.get("new_password")
-    confirm_password = request.form.get("confirm_password")
+    form = UpdateAccount(obj=current_user)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
 
-    current_user.username = username
-    current_user.email = email
+        if form.current_password.data and form.new_password.data and form.confirm_password.data:
+            if not check_password_hash(current_user.password, form.current_password.data):
+                flash("Current password is incorrect.")
+                return render_template("user_account.html", form=form, user=current_user)
 
-    if current_password and new_password and confirm_password:
-        if not check_password_hash(current_user.password, current_password):
-            flash("Current password is incorrect.", "danger")
-            return redirect(url_for("product.update_account"))
-        if new_password != confirm_password:
-            flash("New passwords do not match.", "danger")
-            return redirect(url_for("product.update_account"))
-        current_user.password = generate_password_hash(new_password)
+            if form.new_password.data != form.confirm_password.data:
+                flash("New passwords do not match.")
+                return render_template("user_account.html", form=form, user=current_user)
 
-    db.session.commit()
-    flash("Account updated successfully!", "success")
-    return redirect(url_for("product.user_account", user_id=current_user.id))
+            current_user.password = generate_password_hash(form.new_password.data)
+
+        db.session.commit()
+        flash("Account updated successfully!")
+        return redirect(url_for("auth.update_account"))
+
+    return render_template("user_account.html", form=form, user=current_user)

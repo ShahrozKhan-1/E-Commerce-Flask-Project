@@ -18,14 +18,14 @@ Edit Product
                         
                         <div class="mb-4">
                             {{ form.name.label(class="form-label fw-semibold text-secondary") }}
-                            {{ form.name(class="form-control form-control-lg py-2") }}
+                            {{ form.name(class="form-control text-capitalize form-control-lg py-2") }}
                             {% for error in form.name.errors %}
                                 <div class="text-danger">{{ error }}</div>
                             {% endfor %}
                         </div>
 
                         <div class="mb-4">
-                            {{ form.price.label(class="form-label fw-semibold text-secondary") }}
+                            {{ form.price.label(class="form-label text-capitalize fw-semibold text-secondary") }}
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 {{ form.price(class="form-control form-control-lg py-2") }}
@@ -37,7 +37,7 @@ Edit Product
 
                         <!-- Example for category field -->
                         <div class="mb-4">
-                            {{ form.category.label(class="form-label fw-semibold text-secondary") }}
+                            {{ form.category.label(class="form-label text-capitalize fw-semibold text-secondary") }}
                             {{ form.category(class="form-select form-select-lg") }}
                             {% for error in form.category.errors %}
                                 <div class="text-danger">{{ error }}</div>
@@ -45,7 +45,7 @@ Edit Product
                         </div>
 
                         <div class="mb-4">
-                            {{ form.brand.label(class="form-label fw-semibold text-secondary") }}
+                            {{ form.brand.label(class="form-label text-capitalize fw-semibold text-secondary") }}
                             {{ form.brand(class="form-control form-control-lg py-2") }}
                             {% for error in form.brand.errors %}
                                 <div class="text-danger">{{ error }}</div>

@@ -71,7 +71,6 @@
         font-size: 2.2rem;
         font-weight: 700;
         margin-bottom: 10px;
-
     }
 
     .product-meta {
@@ -147,24 +146,6 @@
         font-size: 1.1rem;
         font-weight: 500;
     }
-
-    /* .btn-add-to-cart {
-        background: BLC;
-        color: white;
-        border: none;
-        padding: 0 30px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        transition: background 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .btn-add-to-cart:hover {
-        background: #245c43;
-    } */
 
     .seller-info {
         background: #f8f9fa;
@@ -262,16 +243,16 @@
         <!-- Product Information -->
         <div class="col-lg-5">
             <div class="product-info-card">
-                <h1 class="product-title">{{ product.name }}</h1>
+                <h1 class="product-title text-capitalize">{{ product.name }}</h1>
                 
                 <div class="product-meta">
                     <div class="meta-item">
-                        <span class="meta-label">Brand</span>
-                        <span class="meta-value">{{ product.brand }}</span>
+                        <span class="meta-labetext-capitalizel ">Brand</span>
+                        <span class="meta-value text-capitalize">{{ product.brand }}</span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">Category</span>
-                        <span class="meta-value">{{ product.category.name }}</span>
+                        <span class="meta-label text-capitalize">Category</span>
+                        <span class="meta-value text-capitalize">{{ product.category.name }}</span>
                     </div>
                 </div>
                 
@@ -291,13 +272,13 @@
                 </form>
                 
                 <div class="seller-info">
-                    <div class="seller-title">Seller Information</div>
+                    <div class="seller-title text-capitalize">Seller Information</div>
                     <div class="seller-details">
-                        <div class="seller-avatar">
+                        <div class="seller-avatar text-capitalize">
                             {{ product.user.username[0]|upper }}
                         </div>
                         <div>
-                            <div class="seller-name">{{ product.user.username }}</div>
+                            <div class="seller-name text-capitalize">{{ product.user.username }}</div>
                             <div class="seller-contact">{{ product.user.email }}</div>
                         </div>
                     </div>

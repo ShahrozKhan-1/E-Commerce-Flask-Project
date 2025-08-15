@@ -162,7 +162,7 @@
         </a>
     </div>
     {% for group in category_products %}
-    <div class="d-flex justify-content-between align-items-center mb-4 category-header">
+    <div class="d-flex justify-content-between align-items-center mb-4 category-header text-capitalize">
         <h3>{{ group.category.name }}</h3>
         <a href="{{ url_for('product.category_products', category_id=group.category.id) }}" 
             class="btn btn-outline-dark see-all-btn rounded-pill">
@@ -211,8 +211,8 @@
 
                     <!-- Card Body -->
                     <div class="card-body">
-                        <p class="card-text">Brand: {{ product.brand }}</p>
-                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-capitalize">Brand: {{ product.brand }}</p>
+                        <h5 class="card-title text-capitalize">{{ product.name }}</h5>
                         <p class="card-text text-truncate" title="{{ product.description }}">
                             {{ product.description }}
                         </p>

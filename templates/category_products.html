@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container py-4">
-    <h2 class="mb-4">{{ category.name }}</h2>
+    <h2 class="mb-4 text-capitalize">{{ category.name }}</h2>
 
     {% if products %}
     <div class="row">
@@ -14,9 +14,9 @@
                 <img src="{{  product.first_image }}" 
                      class="card-img-top rounded-top-4" style="height: 230px; object-fit: cover;">
                 <div class="card-body">
-                    <h5 class="card-title fw-bold">{{ product.name }}</h5>
+                    <h5 class="card-title text-capitalize fw-bold">{{ product.name }}</h5>
                     <p class="fw-bold fs-5">Rs. {{ product.price }}</p>
-                    <p class="text-muted mb-1"><small>Brand:</small> {{ product.brand }}</p>
+                    <p class="text-muted text-capitalize mb-1"><small>Brand:</small> {{ product.brand }}</p>
                     <p class="card-text text-truncate" title="{{ product.description }}">
                         {{ product.description }}
                     </p>
