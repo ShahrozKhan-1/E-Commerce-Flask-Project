@@ -230,54 +230,33 @@ def remove_cart_item(item_id ):
     items = Cart.query.filter_by(user_id=current_user.id)
     return render_template("cart.html", items=items)
 
+
 @product.route("/checkout", methods=["GET", "POST"])
 @login_required
 def checkout():
-    # Get all cart items for the current user
     cart_items = Cart.query.filter_by(user_id=current_user.id).all()
     
     if not cart_items:
         flash('Your cart is empty!', 'warning')
         return redirect(url_for('product.dashboard'))
-
-    # Calculate total price
     total_price = sum(item.product.price * item.quantity for item in cart_items)
     form = OrderDetail()
-
     if form.validate_on_submit():
         try:
-            # Prepare checkout details for each cart item
-            checkout_details = [
-                {
-                    "product_id": item.product.id,
-                    "product_name": item.product.name,
-                    "price": item.product.price,
-                    "quantity": item.quantity,
-                    "subtotal": item.product.price * item.quantity,
-                    "brand": item.product.brand,
-                    "category": item.product.category.name
-                }
-                for item in cart_items
-            ]
-
-            # Create a new Checkout for each Cart item
             for cart_item in cart_items:
                 checkout = Checkout(
                     total_price=total_price,
                     contact_no=form.contact.data,
                     message=form.message.data or "",
                     address=form.address.data,
-                    cart_id=cart_item.id  # Link to the specific cart item
+                    cart_id=cart_item.id 
                 )
                 db.session.add(checkout)
             Cart.query.filter_by(user_id=current_user.id).delete()
             db.session.commit()
-            
-            flash('Your order has been placed successfully!', 'success')
-            return redirect(url_for('product.order_confirmation', order_id=checkout.id))
-            
+            flash('Your order has been placed successfully!')
+            return redirect(url_for('product.order_confirmation', order_id=checkout.id))  
         except Exception as e:
-            db.session.rollback()
             flash(f'An error occurred: {str(e)}', 'error')
 
     return render_template(

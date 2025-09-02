@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
@@ -39,6 +39,7 @@ def create_app(config_class = Config):
         return User.query.get(int(user_id))
     
     with app.app_context():
+        print(current_app.name)
         db.create_all()
     
         
